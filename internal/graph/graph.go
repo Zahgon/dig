@@ -39,22 +39,14 @@ type Graph interface {
 // If a cycle is found, it returns a list of nodes that
 // are in the cyclic path, identified by their orders.
 func IsAcyclic(g Graph) (bool, []int) {
+	_ = "STUB: not implemented"
 	// cycleStart is a node that introduces a cycle in
 	// the graph. Values in the range [1, g.Order()) mean
 	// that there exists a cycle in g.
-	info := newCycleInfo(g.Order())
-
-	for i := 0; i < g.Order(); i++ {
-		info.Reset()
-
-		cycle := isAcyclic(g, i, info, nil /* cycle path */)
-		if len(cycle) > 0 {
-			return false, cycle
-		}
-	}
-
-	return true, nil
+	return false, nil
 }
+
+/* cycle path */
 
 // isAcyclic traverses the given graph starting from a specific node
 // using depth-first search using recursion. If a cycle is detected,
@@ -65,37 +57,15 @@ func IsAcyclic(g Graph) (bool, []int) {
 //
 //	1 -> 2 -> 3 -> 1
 func isAcyclic(g Graph, u int, info cycleInfo, path []int) []int {
+	_ = "STUB: not implemented"
 	// We've already verified that there are no cycles from this node.
-	if info[u].Visited {
-		return nil
-	}
-	info[u].Visited = true
-	info[u].OnStack = true
-
-	path = append(path, u)
-	for _, v := range g.EdgesFrom(u) {
-		if !info[v].Visited {
-			if cycle := isAcyclic(g, v, info, path); len(cycle) > 0 {
-				return cycle
-			}
-		} else if info[v].OnStack {
-			// We've found a cycle, and we have a full path back.
-			// Prune it down to just the cyclic nodes.
-			cycle := path
-			for i := len(cycle) - 1; i >= 0; i-- {
-				if cycle[i] == v {
-					cycle = cycle[i:]
-					break
-				}
-			}
-
-			// Complete the cycle by adding this node to it.
-			return append(cycle, v)
-		}
-	}
-	info[u].OnStack = false
 	return nil
 }
+
+// We've found a cycle, and we have a full path back.
+// Prune it down to just the cyclic nodes.
+
+// Complete the cycle by adding this node to it.
 
 // cycleNode keeps track of a single node's info for cycle detection.
 type cycleNode struct {
@@ -107,12 +77,6 @@ type cycleNode struct {
 // cycles.
 type cycleInfo []cycleNode
 
-func newCycleInfo(order int) cycleInfo {
-	return make(cycleInfo, order)
-}
+func newCycleInfo(order int) cycleInfo { _ = "STUB: not implemented"; return *new(cycleInfo) }
 
-func (info cycleInfo) Reset() {
-	for i := range info {
-		info[i].OnStack = false
-	}
-}
+func (info cycleInfo) Reset() { _ = "STUB: not implemented"; return }

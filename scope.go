@@ -21,12 +21,8 @@
 package dig
 
 import (
-	"bytes"
-	"fmt"
 	"math/rand"
 	"reflect"
-	"sort"
-	"time"
 
 	"go.uber.org/dig/internal/digclock"
 )
@@ -97,21 +93,7 @@ type Scope struct {
 	clockSrc digclock.Clock
 }
 
-func newScope() *Scope {
-	s := &Scope{
-		providers:       make(map[key][]*constructorNode),
-		decorators:      make(map[key]*decoratorNode),
-		values:          make(map[key]reflect.Value),
-		decoratedValues: make(map[key]reflect.Value),
-		groups:          make(map[key][]reflect.Value),
-		decoratedGroups: make(map[key]reflect.Value),
-		invokerFn:       defaultInvoker,
-		rand:            rand.New(rand.NewSource(time.Now().UnixNano())),
-		clockSrc:        digclock.System,
-	}
-	s.gh = newGraphHolder(s)
-	return s
-}
+func newScope() *Scope { _ = "STUB: not implemented"; return nil }
 
 // Scope creates a new Scope with the given name and options from current Scope.
 // Any constructors that the current Scope knows about, as well as any modifications
@@ -119,219 +101,122 @@ func newScope() *Scope {
 // However, no modifications made to the child scope being created will be propagated
 // to the parent Scope.
 func (s *Scope) Scope(name string, opts ...ScopeOption) *Scope {
-	child := newScope()
-	child.name = name
-	child.parentScope = s
-	child.invokerFn = s.invokerFn
-	child.clockSrc = s.clockSrc
-	child.deferAcyclicVerification = s.deferAcyclicVerification
-	child.recoverFromPanics = s.recoverFromPanics
-
-	// child copies the parent's graph nodes.
-	for _, node := range s.gh.nodes {
-		child.gh.nodes = append(child.gh.nodes, node)
-		if ctrNode, ok := node.Wrapped.(*constructorNode); ok {
-			ctrNode.CopyOrder(s, child)
-		}
-	}
-
-	for _, opt := range opts {
-		opt.noScopeOption()
-	}
-
-	s.childScopes = append(s.childScopes, child)
-	return child
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// child copies the parent's graph nodes.
 
 // ancestors returns a list of scopes of ancestors of this scope up to the
 // root. The scope at at index 0 is this scope itself.
-func (s *Scope) ancestors() []*Scope {
-	var scopes []*Scope
-	for s := s; s != nil; s = s.parentScope {
-		scopes = append(scopes, s)
-	}
-	return scopes
-}
+func (s *Scope) ancestors() []*Scope { _ = "STUB: not implemented"; return nil }
 
-func (s *Scope) appendSubscopes(dest []*Scope) []*Scope {
-	dest = append(dest, s)
-	for _, cs := range s.childScopes {
-		dest = cs.appendSubscopes(dest)
-	}
-	return dest
-}
+func (s *Scope) appendSubscopes(dest []*Scope) []*Scope { _ = "STUB: not implemented"; return nil }
 
-func (s *Scope) storesToRoot() []containerStore {
-	scopes := s.ancestors()
-	stores := make([]containerStore, len(scopes))
-	for i, s := range scopes {
-		stores[i] = s
-	}
-	return stores
-}
+func (s *Scope) storesToRoot() []containerStore { _ = "STUB: not implemented"; return nil }
 
-func (s *Scope) knownTypes() []reflect.Type {
-	typeSet := make(map[reflect.Type]struct{}, len(s.providers))
-	for k := range s.providers {
-		typeSet[k.t] = struct{}{}
-	}
-
-	types := make([]reflect.Type, 0, len(typeSet))
-	for t := range typeSet {
-		types = append(types, t)
-	}
-	sort.Sort(byTypeName(types))
-	return types
-}
+func (s *Scope) knownTypes() []reflect.Type { _ = "STUB: not implemented"; return nil }
 
 func (s *Scope) getValue(name string, t reflect.Type) (v reflect.Value, ok bool) {
-	v, ok = s.values[key{name: name, t: t}]
-	return
+	_ = "STUB: not implemented"
+	return *new(reflect.Value), false
 }
 
 func (s *Scope) getDecoratedValue(name string, t reflect.Type) (v reflect.Value, ok bool) {
-	v, ok = s.decoratedValues[key{name: name, t: t}]
-	return
+	_ = "STUB: not implemented"
+	return *new(reflect.Value), false
 }
 
 func (s *Scope) setValue(name string, t reflect.Type, v reflect.Value) {
-	s.values[key{name: name, t: t}] = v
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *Scope) setDecoratedValue(name string, t reflect.Type, v reflect.Value) {
-	s.decoratedValues[key{name: name, t: t}] = v
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *Scope) getValueGroup(name string, t reflect.Type) []reflect.Value {
-	items := s.groups[key{group: name, t: t}]
-	// shuffle the list so users don't rely on the ordering of grouped values
-	return shuffledCopy(s.rand, items)
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// shuffle the list so users don't rely on the ordering of grouped values
+
 func (s *Scope) getDecoratedValueGroup(name string, t reflect.Type) (reflect.Value, bool) {
-	items, ok := s.decoratedGroups[key{group: name, t: t}]
-	return items, ok
+	_ = "STUB: not implemented"
+	return *new(reflect.Value), false
 }
 
 func (s *Scope) submitGroupedValue(name string, t reflect.Type, v reflect.Value) {
-	k := key{group: name, t: t}
-	s.groups[k] = append(s.groups[k], v)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *Scope) submitDecoratedGroupedValue(name string, t reflect.Type, v reflect.Value) {
-	k := key{group: name, t: t}
-	s.decoratedGroups[k] = v
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *Scope) getValueProviders(name string, t reflect.Type) []provider {
-	return s.getProviders(key{name: name, t: t})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Scope) getGroupProviders(name string, t reflect.Type) []provider {
-	return s.getProviders(key{group: name, t: t})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Scope) getValueDecorator(name string, t reflect.Type) (decorator, bool) {
-	return s.getDecorators(key{name: name, t: t})
+	_ = "STUB: not implemented"
+	return *new(decorator), false
 }
 
 func (s *Scope) getGroupDecorator(name string, t reflect.Type) (decorator, bool) {
-	return s.getDecorators(key{group: name, t: t})
+	_ = "STUB: not implemented"
+	return *new(decorator), false
 }
 
 func (s *Scope) getDecorators(k key) (decorator, bool) {
-	d, found := s.decorators[k]
-	return d, found
+	_ = "STUB: not implemented"
+	return *new(decorator), false
 }
 
-func (s *Scope) getProviders(k key) []provider {
-	nodes := s.providers[k]
-	providers := make([]provider, len(nodes))
-	for i, n := range nodes {
-		providers[i] = n
-	}
-	return providers
-}
+func (s *Scope) getProviders(k key) []provider { _ = "STUB: not implemented"; return nil }
 
 func (s *Scope) getAllGroupProviders(name string, t reflect.Type) []provider {
-	return s.getAllProviders(key{group: name, t: t})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Scope) getAllValueProviders(name string, t reflect.Type) []provider {
-	return s.getAllProviders(key{name: name, t: t})
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *Scope) getAllProviders(k key) []provider {
-	allScopes := s.ancestors()
-	var providers []provider
-	for _, scope := range allScopes {
-		providers = append(providers, scope.getProviders(k)...)
-	}
-	return providers
-}
+func (s *Scope) getAllProviders(k key) []provider { _ = "STUB: not implemented"; return nil }
 
-func (s *Scope) invoker() invokerFn {
-	return s.invokerFn
-}
+func (s *Scope) invoker() invokerFn { _ = "STUB: not implemented"; return *new(invokerFn) }
 
 func (s *Scope) clock() digclock.Clock {
-	return s.clockSrc
+	_ = "STUB: not implemented"
+
+	// adds a new graphNode to this Scope and all of its descendent
+	// scope.
+	return *new(digclock.Clock)
 }
 
-// adds a new graphNode to this Scope and all of its descendent
-// scope.
 func (s *Scope) newGraphNode(wrapped interface{}, orders map[*Scope]int) {
-	orders[s] = s.gh.NewNode(wrapped)
-	for _, cs := range s.childScopes {
-		cs.newGraphNode(wrapped, orders)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func (s *Scope) cycleDetectedError(cycle []int) error {
-	var path []cycleErrPathEntry
-	for _, n := range cycle {
-		if n, ok := s.gh.Lookup(n).(*constructorNode); ok {
-			path = append(path, cycleErrPathEntry{
-				Key: key{
-					t: n.CType(),
-				},
-				Func: n.Location(),
-			})
-		}
-	}
-	return errCycleDetected{Path: path, scope: s}
-}
+func (s *Scope) cycleDetectedError(cycle []int) error { _ = "STUB: not implemented"; return nil }
 
 // Returns the root Scope that can be reached from this Scope.
-func (s *Scope) rootScope() *Scope {
-	curr := s
-	for curr.parentScope != nil {
-		curr = curr.parentScope
-	}
-	return curr
-}
+func (s *Scope) rootScope() *Scope { _ = "STUB: not implemented"; return nil }
 
 // String representation of the entire Scope
-func (s *Scope) String() string {
-	b := &bytes.Buffer{}
-	fmt.Fprintln(b, "nodes: {")
-	for k, vs := range s.providers {
-		for _, v := range vs {
-			fmt.Fprintln(b, "\t", k, "->", v)
-		}
-	}
-	fmt.Fprintln(b, "}")
-
-	fmt.Fprintln(b, "values: {")
-	for k, v := range s.values {
-		fmt.Fprintln(b, "\t", k, "=>", v)
-	}
-	for k, vs := range s.groups {
-		for _, v := range vs {
-			fmt.Fprintln(b, "\t", k, "=>", v)
-		}
-	}
-	fmt.Fprintln(b, "}")
-
-	return b.String()
-}
+func (s *Scope) String() string { _ = "STUB: not implemented"; return "" }

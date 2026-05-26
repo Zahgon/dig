@@ -23,7 +23,6 @@ package dig
 import (
 	"fmt"
 	"io"
-	"strings"
 )
 
 const (
@@ -40,28 +39,13 @@ type errInvalidGroupOption struct{ Option string }
 
 var _ digError = errInvalidGroupOption{}
 
-func (e errInvalidGroupOption) Error() string { return fmt.Sprint(e) }
+func (e errInvalidGroupOption) Error() string { _ = "STUB: not implemented"; return "" }
 
 func (e errInvalidGroupOption) writeMessage(w io.Writer, v string) {
-	fmt.Fprintf(w, "invalid option %q", e.Option)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (e errInvalidGroupOption) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errInvalidGroupOption) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
-func parseGroupString(s string) (group, error) {
-	components := strings.Split(s, ",")
-	g := group{Name: components[0]}
-	for _, c := range components[1:] {
-		switch c {
-		case "flatten":
-			g.Flatten = true
-		case "soft":
-			g.Soft = true
-		default:
-			return g, errInvalidGroupOption{Option: c}
-		}
-	}
-	return g, nil
-}
+func parseGroupString(s string) (group, error) { _ = "STUB: not implemented"; return *new(group), nil }

@@ -46,11 +46,9 @@ type graphHolder struct {
 
 var _ graph.Graph = (*graphHolder)(nil)
 
-func newGraphHolder(s *Scope) *graphHolder {
-	return &graphHolder{s: s, snap: -1}
-}
+func newGraphHolder(s *Scope) *graphHolder { _ = "STUB: not implemented"; return nil }
 
-func (gh *graphHolder) Order() int { return len(gh.nodes) }
+func (gh *graphHolder) Order() int { _ = "STUB: not implemented"; return 0 }
 
 // EdgesFrom returns the indices of nodes that are dependencies of node u.
 //
@@ -61,55 +59,25 @@ func (gh *graphHolder) Order() int { return len(gh.nodes) }
 //
 // For value group nodes, it retrieves the group providers from the container
 // and reports their orders.
-func (gh *graphHolder) EdgesFrom(u int) []int {
-	var orders []int
-	switch w := gh.Lookup(u).(type) {
-	case *constructorNode:
-		for _, param := range w.paramList.Params {
-			orders = append(orders, getParamOrder(gh, param)...)
-		}
-	case *paramGroupedSlice:
-		providers := gh.s.getAllGroupProviders(w.Group, w.Type.Elem())
-		for _, provider := range providers {
-			orders = append(orders, provider.Order(gh.s))
-		}
-	}
-	return orders
-}
+func (gh *graphHolder) EdgesFrom(u int) []int { _ = "STUB: not implemented"; return nil }
 
 // NewNode adds a new value to the graph and returns its order.
-func (gh *graphHolder) NewNode(wrapped interface{}) int {
-	order := len(gh.nodes)
-	gh.nodes = append(gh.nodes, &graphNode{
-		Wrapped: wrapped,
-	})
-	return order
-}
+func (gh *graphHolder) NewNode(wrapped interface{}) int { _ = "STUB: not implemented"; return 0 }
 
 // Lookup retrieves the value for the node with the given order.
 // Lookup panics if i is invalid.
-func (gh *graphHolder) Lookup(i int) interface{} {
-	return gh.nodes[i].Wrapped
-}
+func (gh *graphHolder) Lookup(i int) interface{} { _ = "STUB: not implemented"; return nil }
 
 // Snapshot takes a temporary snapshot of the current state of the graph.
 // Use with Rollback to undo changes to the graph.
 //
 // Only one snapshot is allowed at a time.
 // Multiple calls to snapshot will overwrite prior snapshots.
-func (gh *graphHolder) Snapshot() {
-	gh.snap = len(gh.nodes)
-}
+func (gh *graphHolder) Snapshot() { _ = "STUB: not implemented"; return }
 
 // Rollback rolls back a snapshot to a previously captured state.
 // This is a no-op if no snapshot was captured.
-func (gh *graphHolder) Rollback() {
-	if gh.snap < 0 {
-		return
-	}
+func (gh *graphHolder) Rollback() { _ = "STUB: not implemented"; return }
 
-	// nodes is an append-only list. To rollback, we just drop the
-	// extraneous entries from the slice.
-	gh.nodes = gh.nodes[:gh.snap]
-	gh.snap = -1
-}
+// nodes is an append-only list. To rollback, we just drop the
+// extraneous entries from the slice.

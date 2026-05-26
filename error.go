@@ -21,11 +21,8 @@
 package dig
 
 import (
-	"errors"
 	"fmt"
 	"io"
-	"reflect"
-	"sort"
 
 	"go.uber.org/dig/internal/digreflect"
 	"go.uber.org/dig/internal/dot"
@@ -92,45 +89,19 @@ type PanicError struct {
 }
 
 // Format will format the PanicError, expanding the corresponding function if in +v mode.
-func (e PanicError) Format(w fmt.State, c rune) {
-	if w.Flag('+') && c == 'v' {
-		fmt.Fprintf(w, "panic: %q in func: %+v", e.Panic, e.fn)
-	} else {
-		fmt.Fprintf(w, "panic: %q in func: %v", e.Panic, e.fn)
-	}
-}
+func (e PanicError) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
-func (e PanicError) Error() string {
-	return fmt.Sprint(e)
-}
+func (e PanicError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // formatError will call a dig.Error's writeMessage() method to print the error message
 // and then will automatically attempt to print errors wrapped underneath (which can create
 // a recursive effect if the wrapped error's Format() method then points back to this function).
-func formatError(e digError, w fmt.State, v rune) {
-	multiline := w.Flag('+') && v == 'v'
-	verb := "%v"
-	if multiline {
-		verb = "%+v"
-	}
+func formatError(e digError, w fmt.State, v rune) { _ = "STUB: not implemented"; return }
 
-	// "context: " or "context:\n"
-	e.writeMessage(w, verb)
+// "context: " or "context:\n"
 
-	// Will route back to this function recursively if next error
-	// is also wrapped and points back here
-	wrappedError := errors.Unwrap(e)
-	if wrappedError == nil {
-		return
-	}
-	io.WriteString(w, ":")
-	if multiline {
-		io.WriteString(w, "\n")
-	} else {
-		io.WriteString(w, " ")
-	}
-	fmt.Fprintf(w, verb, wrappedError)
-}
+// Will route back to this function recursively if next error
+// is also wrapped and points back here
 
 // RootCause returns the first non-dig.Error in a chain of wrapped
 // errors, if there is one. Otherwise, RootCause returns the error
@@ -150,16 +121,10 @@ func formatError(e digError, w fmt.State, v rune) {
 // See [PanicError] for an example showing how to additionally detect
 // and handle panics in provided/invoked/decorated functions.
 func RootCause(err error) error {
-	var de Error
+	_ = "STUB: not implemented"
+
 	// Dig down to first non dig.Error, or bottom of chain
-	for ; errors.As(err, &de); err = errors.Unwrap(de) {
-	}
-
-	if err == nil {
-		return de
-	}
-
-	return err
+	return nil
 }
 
 // errInvalidInput is returned whenever the user provides bad input when
@@ -178,20 +143,17 @@ var _ digError = errInvalidInput{}
 // nil, replicating errors.Unwrap's behavior when passed an error without
 // an Unwrap() method.
 func newErrInvalidInput(msg string, cause error) errInvalidInput {
-	return errInvalidInput{msg, cause}
+	_ = "STUB: not implemented"
+	return *new(errInvalidInput)
 }
 
-func (e errInvalidInput) Error() string { return fmt.Sprint(e) }
+func (e errInvalidInput) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errInvalidInput) Unwrap() error { return e.Cause }
+func (e errInvalidInput) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e errInvalidInput) writeMessage(w io.Writer, _ string) {
-	fmt.Fprint(w, e.Message)
-}
+func (e errInvalidInput) writeMessage(w io.Writer, _ string) { _ = "STUB: not implemented"; return }
 
-func (e errInvalidInput) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errInvalidInput) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // errProvide is returned when a constructor could not be Provided into the
 // container.
@@ -202,17 +164,13 @@ type errProvide struct {
 
 var _ digError = errProvide{}
 
-func (e errProvide) Error() string { return fmt.Sprint(e) }
+func (e errProvide) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errProvide) Unwrap() error { return e.Reason }
+func (e errProvide) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e errProvide) writeMessage(w io.Writer, verb string) {
-	fmt.Fprintf(w, "cannot provide function "+verb, e.Func)
-}
+func (e errProvide) writeMessage(w io.Writer, verb string) { _ = "STUB: not implemented"; return }
 
-func (e errProvide) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errProvide) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // errConstructorFailed is returned when a user-provided constructor failed
 // with a non-nil error.
@@ -223,17 +181,16 @@ type errConstructorFailed struct {
 
 var _ digError = errConstructorFailed{}
 
-func (e errConstructorFailed) Error() string { return fmt.Sprint(e) }
+func (e errConstructorFailed) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errConstructorFailed) Unwrap() error { return e.Reason }
+func (e errConstructorFailed) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 func (e errConstructorFailed) writeMessage(w io.Writer, verb string) {
-	fmt.Fprintf(w, "received non-nil error from function "+verb, e.Func)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (e errConstructorFailed) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errConstructorFailed) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // errArgumentsFailed is returned when a function could not be run because one
 // of its dependencies failed to build for any reason.
@@ -244,17 +201,16 @@ type errArgumentsFailed struct {
 
 var _ digError = errArgumentsFailed{}
 
-func (e errArgumentsFailed) Error() string { return fmt.Sprint(e) }
+func (e errArgumentsFailed) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errArgumentsFailed) Unwrap() error { return e.Reason }
+func (e errArgumentsFailed) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 func (e errArgumentsFailed) writeMessage(w io.Writer, verb string) {
-	fmt.Fprintf(w, "could not build arguments for function "+verb, e.Func)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (e errArgumentsFailed) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errArgumentsFailed) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // errMissingDependencies is returned when the dependencies of a function are
 // not available in the container.
@@ -265,17 +221,16 @@ type errMissingDependencies struct {
 
 var _ digError = errMissingDependencies{}
 
-func (e errMissingDependencies) Error() string { return fmt.Sprint(e) }
+func (e errMissingDependencies) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errMissingDependencies) Unwrap() error { return e.Reason }
+func (e errMissingDependencies) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 func (e errMissingDependencies) writeMessage(w io.Writer, verb string) {
-	fmt.Fprintf(w, "missing dependencies for function "+verb, e.Func)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (e errMissingDependencies) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errMissingDependencies) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // errParamSingleFailed is returned when a paramSingle could not be built.
 type errParamSingleFailed struct {
@@ -286,28 +241,18 @@ type errParamSingleFailed struct {
 
 var _ digError = errParamSingleFailed{}
 
-func (e errParamSingleFailed) Error() string { return fmt.Sprint(e) }
+func (e errParamSingleFailed) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errParamSingleFailed) Unwrap() error { return e.Reason }
+func (e errParamSingleFailed) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 func (e errParamSingleFailed) writeMessage(w io.Writer, _ string) {
-	fmt.Fprintf(w, "failed to build %v", e.Key)
+	_ = "STUB: not implemented"
+	return
 }
 
-func (e errParamSingleFailed) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errParamSingleFailed) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
-func (e errParamSingleFailed) updateGraph(g *dot.Graph) {
-	failed := &dot.Result{
-		Node: &dot.Node{
-			Name:  e.Key.name,
-			Group: e.Key.group,
-			Type:  e.Key.t,
-		},
-	}
-	g.FailNodes([]*dot.Result{failed}, e.CtorID)
-}
+func (e errParamSingleFailed) updateGraph(g *dot.Graph) { _ = "STUB: not implemented"; return }
 
 // errParamGroupFailed is returned when a value group cannot be built because
 // any of the values in the group failed to build.
@@ -319,21 +264,15 @@ type errParamGroupFailed struct {
 
 var _ digError = errParamGroupFailed{}
 
-func (e errParamGroupFailed) Error() string { return fmt.Sprint(e) }
+func (e errParamGroupFailed) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e errParamGroupFailed) Unwrap() error { return e.Reason }
+func (e errParamGroupFailed) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e errParamGroupFailed) writeMessage(w io.Writer, _ string) {
-	fmt.Fprintf(w, "could not build value group %v", e.Key)
-}
+func (e errParamGroupFailed) writeMessage(w io.Writer, _ string) { _ = "STUB: not implemented"; return }
 
-func (e errParamGroupFailed) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errParamGroupFailed) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
-func (e errParamGroupFailed) updateGraph(g *dot.Graph) {
-	g.FailGroupNodes(e.Key.group, e.Key.t, e.CtorID)
-}
+func (e errParamGroupFailed) updateGraph(g *dot.Graph) { _ = "STUB: not implemented"; return }
 
 // missingType holds information about a type that was missing in the
 // container.
@@ -358,42 +297,7 @@ type missingType struct {
 //	io.Writer: did you mean to Provide it?
 //	io.Writer: did you mean to use *bytes.Buffer?
 //	io.Writer: did you mean to use one of *bytes.Buffer, or *os.File?
-func (mt missingType) Format(w fmt.State, v rune) {
-	plusV := w.Flag('+') && v == 'v'
-
-	fmt.Fprint(w, mt.Key)
-	switch len(mt.suggestions) {
-	case 0:
-		if plusV {
-			io.WriteString(w, " (did you mean to Provide it?)")
-		}
-	case 1:
-		sug := mt.suggestions[0]
-		if plusV {
-			fmt.Fprintf(w, " (did you mean to use %v?)", sug)
-		} else {
-			fmt.Fprintf(w, " (did you mean %v?)", sug)
-		}
-	default:
-		if plusV {
-			io.WriteString(w, " (did you mean to use one of ")
-		} else {
-			io.WriteString(w, " (did you mean ")
-		}
-
-		lastIdx := len(mt.suggestions) - 1
-		for i, sug := range mt.suggestions {
-			if i > 0 {
-				io.WriteString(w, ", ")
-				if i == lastIdx {
-					io.WriteString(w, "or ")
-				}
-			}
-			fmt.Fprint(w, sug)
-		}
-		io.WriteString(w, "?)")
-	}
-}
+func (mt missingType) Format(w fmt.State, v rune) { _ = "STUB: not implemented"; return }
 
 // errMissingType is returned when one or more values that were expected in
 // the container were not available.
@@ -404,121 +308,39 @@ type errMissingTypes []missingType // inv: len > 0
 var _ digError = errMissingTypes(nil)
 
 func newErrMissingTypes(c containerStore, k key) errMissingTypes {
+	_ = "STUB: not implemented"
 	// Possible types we will look for in the container. We will always look
 	// for pointers to the requested type and some extras on a per-Kind basis.
-	suggestions := []reflect.Type{reflect.PointerTo(k.t)}
-
-	if k.t.Kind() == reflect.Ptr {
-		// The user requested a pointer but maybe we have a value.
-		suggestions = append(suggestions, k.t.Elem())
-	}
-
-	if k.t.Kind() == reflect.Slice {
-		// Maybe the user meant a slice of pointers while we have the slice of elements
-		suggestions = append(suggestions, reflect.SliceOf(reflect.PointerTo(k.t.Elem())))
-
-		// Maybe the user meant a slice of elements while we have the slice of pointers
-		sliceElement := k.t.Elem()
-		if sliceElement.Kind() == reflect.Ptr {
-			suggestions = append(suggestions, reflect.SliceOf(sliceElement.Elem()))
-		}
-	}
-
-	if k.t.Kind() == reflect.Array {
-		// Maybe the user meant an array of pointers while we have the array of elements
-		suggestions = append(suggestions, reflect.ArrayOf(k.t.Len(), reflect.PointerTo(k.t.Elem())))
-
-		// Maybe the user meant an array of elements while we have the array of pointers
-		arrayElement := k.t.Elem()
-		if arrayElement.Kind() == reflect.Ptr {
-			suggestions = append(suggestions, reflect.ArrayOf(k.t.Len(), arrayElement.Elem()))
-		}
-	}
-
-	knownTypes := c.knownTypes()
-	if k.t.Kind() == reflect.Interface {
-		// Maybe we have an implementation of the interface.
-		for _, t := range knownTypes {
-			if t.Implements(k.t) {
-				suggestions = append(suggestions, t)
-			}
-		}
-	} else {
-		// Maybe we have an interface that this type implements.
-		for _, t := range knownTypes {
-			if t.Kind() == reflect.Interface {
-				if k.t.Implements(t) {
-					suggestions = append(suggestions, t)
-				}
-			}
-		}
-	}
-
-	// range through c.providers is non-deterministic. Let's sort the list of
-	// suggestions.
-	sort.Sort(byTypeName(suggestions))
-
-	mt := missingType{Key: k}
-	for _, t := range suggestions {
-		if len(c.getValueProviders(k.name, t)) > 0 {
-			k.t = t
-			mt.suggestions = append(mt.suggestions, k)
-		}
-	}
-
-	return errMissingTypes{mt}
+	return *new(errMissingTypes)
 }
 
-func (e errMissingTypes) Error() string { return fmt.Sprint(e) }
+// The user requested a pointer but maybe we have a value.
 
-func (e errMissingTypes) writeMessage(w io.Writer, v string) {
-	multiline := v == "%+v"
+// Maybe the user meant a slice of pointers while we have the slice of elements
 
-	if len(e) == 1 {
-		io.WriteString(w, "missing type:")
-	} else {
-		io.WriteString(w, "missing types:")
-	}
+// Maybe the user meant a slice of elements while we have the slice of pointers
 
-	if !multiline {
-		// With %v, we need a space between : since the error
-		// won't be on a new line.
-		io.WriteString(w, " ")
-	}
+// Maybe the user meant an array of pointers while we have the array of elements
 
-	for i, mt := range e {
-		if multiline {
-			io.WriteString(w, "\n\t- ")
-		} else if i > 0 {
-			io.WriteString(w, "; ")
-		}
+// Maybe the user meant an array of elements while we have the array of pointers
 
-		if multiline {
-			fmt.Fprintf(w, "%+v", mt)
-		} else {
-			fmt.Fprintf(w, "%v", mt)
-		}
-	}
-}
+// Maybe we have an implementation of the interface.
 
-func (e errMissingTypes) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+// Maybe we have an interface that this type implements.
 
-func (e errMissingTypes) updateGraph(g *dot.Graph) {
-	missing := make([]*dot.Result, len(e))
+// range through c.providers is non-deterministic. Let's sort the list of
+// suggestions.
 
-	for i, mt := range e {
-		missing[i] = &dot.Result{
-			Node: &dot.Node{
-				Name:  mt.Key.name,
-				Group: mt.Key.group,
-				Type:  mt.Key.t,
-			},
-		}
-	}
-	g.AddMissingNodes(missing)
-}
+func (e errMissingTypes) Error() string { _ = "STUB: not implemented"; return "" }
+
+func (e errMissingTypes) writeMessage(w io.Writer, v string) { _ = "STUB: not implemented"; return }
+
+// With %v, we need a space between : since the error
+// won't be on a new line.
+
+func (e errMissingTypes) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
+
+func (e errMissingTypes) updateGraph(g *dot.Graph) { _ = "STUB: not implemented"; return }
 
 type errVisualizer interface {
 	updateGraph(*dot.Graph)

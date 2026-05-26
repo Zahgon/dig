@@ -21,8 +21,6 @@
 package dig
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"io"
 
@@ -42,38 +40,21 @@ type errCycleDetected struct {
 var _ digError = errCycleDetected{}
 
 func (e errCycleDetected) Error() string {
+	_ = "STUB: not implemented"
 	// We get something like,
 	//
-	//   [scope "foo"]
-	//   func(*bar) *foo provided by "path/to/package".NewFoo (path/to/file.go:42)
-	//   	depends on func(*baz) *bar provided by "another/package".NewBar (somefile.go:1)
-	//   	depends on func(*foo) baz provided by "somepackage".NewBar (anotherfile.go:2)
-	//   	depends on func(*bar) *foo provided by "path/to/package".NewFoo (path/to/file.go:42)
-	//
-	b := new(bytes.Buffer)
-
-	if name := e.scope.name; len(name) > 0 {
-		fmt.Fprintf(b, "[scope %q]\n", name)
-	}
-	for i, entry := range e.Path {
-		if i > 0 {
-			b.WriteString("\n\tdepends on ")
-		}
-		fmt.Fprintf(b, "%v provided by %v", entry.Key, entry.Func)
-	}
-	return b.String()
+	//	[scope "foo"]
+	//	func(*bar) *foo provided by "path/to/package".NewFoo (path/to/file.go:42)
+	//		depends on func(*baz) *bar provided by "another/package".NewBar (somefile.go:1)
+	//		depends on func(*foo) baz provided by "somepackage".NewBar (anotherfile.go:2)
+	//		depends on func(*bar) *foo provided by "path/to/package".NewFoo (path/to/file.go:42)
+	return ""
 }
 
-func (e errCycleDetected) writeMessage(w io.Writer, v string) {
-	fmt.Fprint(w, e.Error())
-}
+func (e errCycleDetected) writeMessage(w io.Writer, v string) { _ = "STUB: not implemented"; return }
 
-func (e errCycleDetected) Format(w fmt.State, c rune) {
-	formatError(e, w, c)
-}
+func (e errCycleDetected) Format(w fmt.State, c rune) { _ = "STUB: not implemented"; return }
 
 // IsCycleDetected returns a boolean as to whether the provided error indicates
 // a cycle was detected in the container graph.
-func IsCycleDetected(err error) bool {
-	return errors.As(err, &errCycleDetected{})
-}
+func IsCycleDetected(err error) bool { _ = "STUB: not implemented"; return false }

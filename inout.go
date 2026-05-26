@@ -21,10 +21,7 @@
 package dig
 
 import (
-	"container/list"
-	"fmt"
 	"reflect"
-	"strconv"
 )
 
 var (
@@ -80,9 +77,7 @@ type In struct{ _ digSentinel }
 //	            information.
 type Out struct{ _ digSentinel }
 
-func isError(t reflect.Type) bool {
-	return t.Implements(_errType)
-}
+func isError(t reflect.Type) bool { _ = "STUB: not implemented"; return false }
 
 // IsIn checks whether the given struct is a dig.In struct. A struct qualifies
 // as a dig.In struct if it embeds the dig.In type or if any struct that it
@@ -94,9 +89,7 @@ func isError(t reflect.Type) bool {
 //
 // See the documentation for dig.In for a comprehensive list of supported
 // tags.
-func IsIn(o interface{}) bool {
-	return embedsType(o, _inType)
-}
+func IsIn(o interface{}) bool { _ = "STUB: not implemented"; return false }
 
 // IsOut checks whether the given struct is a dig.Out struct. A struct
 // qualifies as a dig.Out struct if it embeds the dig.Out type or if any
@@ -108,68 +101,30 @@ func IsIn(o interface{}) bool {
 //
 // See the documentation for dig.Out for a comprehensive list of supported
 // tags.
-func IsOut(o interface{}) bool {
-	return embedsType(o, _outType)
-}
+func IsOut(o interface{}) bool { _ = "STUB: not implemented"; return false }
 
 // Returns true if t embeds e or if any of the types embedded by t embed e.
 func embedsType(i interface{}, e reflect.Type) bool {
+	_ = "STUB: not implemented"
 	// TODO: this function doesn't consider e being a pointer.
 	// given `type A foo { *In }`, this function would return false for
 	// embedding dig.In, which makes for some extra error checking in places
 	// that call this function. Might be worthwhile to consider reflect.Indirect
 	// usage to clean up the callers.
-
-	if i == nil {
-		return false
-	}
-
-	// maybe it's already a reflect.Type
-	t, ok := i.(reflect.Type)
-	if !ok {
-		// take the type if it's not
-		t = reflect.TypeOf(i)
-	}
-
-	// We are going to do a breadth-first search of all embedded fields.
-	types := list.New()
-	types.PushBack(t)
-	for types.Len() > 0 {
-		t := types.Remove(types.Front()).(reflect.Type)
-
-		if t == e {
-			return true
-		}
-
-		if t.Kind() != reflect.Struct {
-			continue
-		}
-
-		for i := 0; i < t.NumField(); i++ {
-			f := t.Field(i)
-			if f.Anonymous {
-				types.PushBack(f.Type)
-			}
-		}
-	}
-
-	// If perf is an issue, we can cache known In objects and Out objects in a
-	// map[reflect.Type]struct{}.
 	return false
 }
 
+// maybe it's already a reflect.Type
+
+// take the type if it's not
+
+// We are going to do a breadth-first search of all embedded fields.
+
+// If perf is an issue, we can cache known In objects and Out objects in a
+// map[reflect.Type]struct{}.
+
 // Checks if a field of an In struct is optional.
 func isFieldOptional(f reflect.StructField) (bool, error) {
-	tag := f.Tag.Get(_optionalTag)
-	if tag == "" {
-		return false, nil
-	}
-
-	optional, err := strconv.ParseBool(tag)
-	if err != nil {
-		err = newErrInvalidInput(
-			fmt.Sprintf("invalid value %q for %q tag on field %v", tag, _optionalTag, f.Name), err)
-	}
-
-	return optional, err
+	_ = "STUB: not implemented"
+	return false, nil
 }

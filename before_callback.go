@@ -50,9 +50,8 @@ type BeforeCallback func(bci BeforeCallbackInfo)
 //
 // See [BeforeCallbackInfo] for more info on the information passed to the [BeforeCallback].
 func WithProviderBeforeCallback(callback BeforeCallback) ProvideOption {
-	return withBeforeCallbackOption{
-		callback: callback,
-	}
+	_ = "STUB: not implemented"
+	return *new(ProvideOption)
 }
 
 // WithDecoratorBeforeCallback returns a [DecorateOption] which has Dig call
@@ -71,9 +70,8 @@ func WithProviderBeforeCallback(callback BeforeCallback) ProvideOption {
 //
 // See [BeforeCallbackInfo] for more info on the information passed to the [BeforeCallback].
 func WithDecoratorBeforeCallback(callback BeforeCallback) DecorateOption {
-	return withBeforeCallbackOption{
-		callback: callback,
-	}
+	_ = "STUB: not implemented"
+	return *new(DecorateOption)
 }
 
 type withBeforeCallbackOption struct {
@@ -86,9 +84,8 @@ var (
 )
 
 func (o withBeforeCallbackOption) applyProvideOption(po *provideOptions) {
-	po.BeforeCallback = o.callback
+	_ = "STUB: not implemented"
+	return
 }
 
-func (o withBeforeCallbackOption) apply(do *decorateOptions) {
-	do.BeforeCallback = o.callback
-}
+func (o withBeforeCallbackOption) apply(do *decorateOptions) { _ = "STUB: not implemented"; return }

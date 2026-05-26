@@ -20,9 +20,5 @@
 
 package myrepository
 
-import "fmt"
-
 // Hello says hello.
-func Hello() {
-	fmt.Println("hello")
-}
+func Hello() { _ = "STUB: not implemented"; return }

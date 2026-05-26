@@ -23,7 +23,6 @@ package digtest
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"go.uber.org/dig"
 )
 
@@ -56,75 +55,60 @@ type Scope struct {
 type scope = dig.Scope
 
 // New builds a new testing container.
-func New(t testing.TB, opts ...dig.Option) *Container {
-	return &Container{
-		t:         t,
-		Container: dig.New(opts...),
-	}
-}
+func New(t testing.TB, opts ...dig.Option) *Container { _ = "STUB: not implemented"; return nil }
 
 // RequireProvide provides the given function to the container,
 // halting the test if it fails.
 func (c *Container) RequireProvide(f interface{}, opts ...dig.ProvideOption) {
-	c.t.Helper()
-
-	require.NoError(c.t, c.Provide(f, opts...), "failed to provide")
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequireProvide provides the given function to the scope,
 // halting the test if it fails.
 func (s *Scope) RequireProvide(f interface{}, opts ...dig.ProvideOption) {
-	s.t.Helper()
-
-	require.NoError(s.t, s.Provide(f, opts...), "failed to provide")
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequireInvoke invokes the given function to the container,
 // halting the test if it fails.
 func (c *Container) RequireInvoke(f interface{}, opts ...dig.InvokeOption) {
-	c.t.Helper()
-
-	require.NoError(c.t, c.Invoke(f, opts...), "failed to invoke")
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequireInvoke invokes the given function to the scope,
 // halting the test if it fails.
 func (s *Scope) RequireInvoke(f interface{}, opts ...dig.InvokeOption) {
-	s.t.Helper()
-
-	require.NoError(s.t, s.Invoke(f, opts...), "failed to invoke")
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequireDecorate decorates the scope using the given function,
 // halting the test if it fails.
 func (c *Container) RequireDecorate(f interface{}, opts ...dig.DecorateOption) {
-	c.t.Helper()
-
-	require.NoError(c.t, c.Decorate(f, opts...), "failed to decorate")
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequireDecorate decorates the scope using the given function,
 // halting the test if it fails.
 func (s *Scope) RequireDecorate(f interface{}, opts ...dig.DecorateOption) {
-	s.t.Helper()
-
-	require.NoError(s.t, s.Decorate(f, opts...), "failed to decorate")
+	_ = "STUB: not implemented"
+	return
 }
 
 // Scope builds a subscope of this container with the given name.
 // The returned Scope is similarly augmented to ease testing.
 func (c *Container) Scope(name string, opts ...dig.ScopeOption) *Scope {
-	return &Scope{
-		scope: c.Container.Scope(name, opts...),
-		t:     c.t,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Scope builds a subscope of this scope with the given name.
 // The returned Scope is similarly augmented to ease testing.
 func (s *Scope) Scope(name string, opts ...dig.ScopeOption) *Scope {
-	return &Scope{
-		scope: s.scope.Scope(name, opts...),
-		t:     s.t,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

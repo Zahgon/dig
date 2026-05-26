@@ -21,14 +21,10 @@
 package dig
 
 import (
-	"bytes"
-	"fmt"
 	"reflect"
-	"strings"
 
 	"go.uber.org/dig/internal/digreflect"
 	"go.uber.org/dig/internal/dot"
-	"go.uber.org/dig/internal/graph"
 )
 
 // A ProvideOption modifies the default behavior of Provide.
@@ -47,47 +43,12 @@ type provideOptions struct {
 	BeforeCallback BeforeCallback
 }
 
-func (o *provideOptions) Validate() error {
-	if len(o.Group) > 0 {
-		if len(o.Name) > 0 {
-			return newErrInvalidInput(
-				fmt.Sprintf("cannot use named values with value groups: name:%q provided with group:%q", o.Name, o.Group), nil)
-		}
-	}
+func (o *provideOptions) Validate() error { _ = "STUB: not implemented"; return nil }
 
-	// Names must be representable inside a backquoted string. The only
-	// limitation for raw string literals as per
-	// https://golang.org/ref/spec#raw_string_lit is that they cannot contain
-	// backquotes.
-	if strings.ContainsRune(o.Name, '`') {
-		return newErrInvalidInput(
-			fmt.Sprintf("invalid dig.Name(%q): names cannot contain backquotes", o.Name), nil)
-	}
-	if strings.ContainsRune(o.Group, '`') {
-		return newErrInvalidInput(
-			fmt.Sprintf("invalid dig.Group(%q): group names cannot contain backquotes", o.Group), nil)
-	}
-
-	for _, i := range o.As {
-		t := reflect.TypeOf(i)
-
-		if t == nil {
-			return newErrInvalidInput("invalid dig.As(nil): argument must be a pointer to an interface", nil)
-		}
-
-		if t.Kind() != reflect.Ptr {
-			return newErrInvalidInput(
-				fmt.Sprintf("invalid dig.As(%v): argument must be a pointer to an interface", t), nil)
-		}
-
-		pointingTo := t.Elem()
-		if pointingTo.Kind() != reflect.Interface {
-			return newErrInvalidInput(
-				fmt.Sprintf("invalid dig.As(*%v): argument must be a pointer to an interface", pointingTo), nil)
-		}
-	}
-	return nil
-}
+// Names must be representable inside a backquoted string. The only
+// limitation for raw string literals as per
+// https://golang.org/ref/spec#raw_string_lit is that they cannot contain
+// backquotes.
 
 // Name is a ProvideOption that specifies that all values produced by a
 // constructor should have the given name. See also the package documentation
@@ -106,41 +67,37 @@ func (o *provideOptions) Validate() error {
 //
 // This option cannot be provided for constructors which produce result
 // objects.
-func Name(name string) ProvideOption {
-	return provideNameOption(name)
-}
+func Name(name string) ProvideOption { _ = "STUB: not implemented"; return *new(ProvideOption) }
 
 type provideNameOption string
 
-func (o provideNameOption) String() string {
-	return fmt.Sprintf("Name(%q)", string(o))
-}
+func (o provideNameOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o provideNameOption) applyProvideOption(opt *provideOptions) {
-	opt.Name = string(o)
+	_ = "STUB: not implemented"
+	return
+
+	// Group is a ProvideOption that specifies that all values produced by a
+	// constructor should be added to the specified group. See also the package
+	// documentation about Value Groups.
+	//
+	// This option cannot be provided for constructors which produce result
+	// objects.
 }
 
-// Group is a ProvideOption that specifies that all values produced by a
-// constructor should be added to the specified group. See also the package
-// documentation about Value Groups.
-//
-// This option cannot be provided for constructors which produce result
-// objects.
-func Group(group string) ProvideOption {
-	return provideGroupOption(group)
-}
+func Group(group string) ProvideOption { _ = "STUB: not implemented"; return *new(ProvideOption) }
 
 type provideGroupOption string
 
-func (o provideGroupOption) String() string {
-	return fmt.Sprintf("Group(%q)", string(o))
-}
+func (o provideGroupOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o provideGroupOption) applyProvideOption(opt *provideOptions) {
-	opt.Group = string(o)
+	_ = "STUB: not implemented"
+	return
+
+	// ID is a unique integer representing the constructor node in the dependency graph.
 }
 
-// ID is a unique integer representing the constructor node in the dependency graph.
 type ID int
 
 // ProvideInfo provides information about the constructor's inputs and outputs
@@ -160,24 +117,7 @@ type Input struct {
 	name, group string
 }
 
-func (i *Input) String() string {
-	toks := make([]string, 0, 3)
-	t := i.t.String()
-	if i.optional {
-		toks = append(toks, "optional")
-	}
-	if i.name != "" {
-		toks = append(toks, fmt.Sprintf("name = %q", i.name))
-	}
-	if i.group != "" {
-		toks = append(toks, fmt.Sprintf("group = %q", i.group))
-	}
-
-	if len(toks) == 0 {
-		return t
-	}
-	return fmt.Sprintf("%v[%v]", t, strings.Join(toks, ", "))
-}
+func (i *Input) String() string { _ = "STUB: not implemented"; return "" }
 
 // Output contains information on an output produced by a function.
 type Output struct {
@@ -185,100 +125,76 @@ type Output struct {
 	name, group string
 }
 
-func (o *Output) String() string {
-	toks := make([]string, 0, 2)
-	t := o.t.String()
-	if o.name != "" {
-		toks = append(toks, fmt.Sprintf("name = %q", o.name))
-	}
-	if o.group != "" {
-		toks = append(toks, fmt.Sprintf("group = %q", o.group))
-	}
-
-	if len(toks) == 0 {
-		return t
-	}
-	return fmt.Sprintf("%v[%v]", t, strings.Join(toks, ", "))
-}
+func (o *Output) String() string { _ = "STUB: not implemented"; return "" }
 
 // FillProvideInfo is a ProvideOption that writes info on what Dig was able to get
 // out of the provided constructor into the provided ProvideInfo.
 func FillProvideInfo(info *ProvideInfo) ProvideOption {
-	return fillProvideInfoOption{info: info}
+	_ = "STUB: not implemented"
+	return *new(ProvideOption)
 }
 
 type fillProvideInfoOption struct{ info *ProvideInfo }
 
-func (o fillProvideInfoOption) String() string {
-	return fmt.Sprintf("FillProvideInfo(%p)", o.info)
-}
+func (o fillProvideInfoOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o fillProvideInfoOption) applyProvideOption(opts *provideOptions) {
-	opts.Info = o.info
+	_ = "STUB: not implemented"
+	return
+
+	// As is a ProvideOption that specifies that the value produced by the
+	// constructor implements one or more other interfaces and is provided
+	// to the container as those interfaces.
+	//
+	// As expects one or more pointers to the implemented interfaces. Values
+	// produced by constructors will be then available in the container as
+	// implementations of all of those interfaces, but not as the value itself.
+	//
+	// For example, the following will make io.Reader and io.Writer available
+	// in the container, but not buffer.
+	//
+	//	c.Provide(newBuffer, dig.As(new(io.Reader), new(io.Writer)))
+	//
+	// That is, the above is equivalent to the following.
+	//
+	//	c.Provide(func(...) (io.Reader, io.Writer) {
+	//	  b := newBuffer(...)
+	//	  return b, b
+	//	})
+	//
+	// If used with dig.Name, the type produced by the constructor and the types
+	// specified with dig.As will all use the same name. For example,
+	//
+	//	c.Provide(newFile, dig.As(new(io.Reader)), dig.Name("temp"))
+	//
+	// The above is equivalent to the following.
+	//
+	//	type Result struct {
+	//	  dig.Out
+	//
+	//	  Reader io.Reader `name:"temp"`
+	//	}
+	//
+	//	c.Provide(func(...) Result {
+	//	  f := newFile(...)
+	//	  return Result{
+	//	    Reader: f,
+	//	  }
+	//	})
+	//
+	// This option cannot be provided for constructors which produce result
+	// objects.
 }
 
-// As is a ProvideOption that specifies that the value produced by the
-// constructor implements one or more other interfaces and is provided
-// to the container as those interfaces.
-//
-// As expects one or more pointers to the implemented interfaces. Values
-// produced by constructors will be then available in the container as
-// implementations of all of those interfaces, but not as the value itself.
-//
-// For example, the following will make io.Reader and io.Writer available
-// in the container, but not buffer.
-//
-//	c.Provide(newBuffer, dig.As(new(io.Reader), new(io.Writer)))
-//
-// That is, the above is equivalent to the following.
-//
-//	c.Provide(func(...) (io.Reader, io.Writer) {
-//	  b := newBuffer(...)
-//	  return b, b
-//	})
-//
-// If used with dig.Name, the type produced by the constructor and the types
-// specified with dig.As will all use the same name. For example,
-//
-//	c.Provide(newFile, dig.As(new(io.Reader)), dig.Name("temp"))
-//
-// The above is equivalent to the following.
-//
-//	type Result struct {
-//	  dig.Out
-//
-//	  Reader io.Reader `name:"temp"`
-//	}
-//
-//	c.Provide(func(...) Result {
-//	  f := newFile(...)
-//	  return Result{
-//	    Reader: f,
-//	  }
-//	})
-//
-// This option cannot be provided for constructors which produce result
-// objects.
-func As(i ...interface{}) ProvideOption {
-	return provideAsOption(i)
-}
+func As(i ...interface{}) ProvideOption { _ = "STUB: not implemented"; return *new(ProvideOption) }
 
 type provideAsOption []interface{}
 
-func (o provideAsOption) String() string {
-	buf := bytes.NewBufferString("As(")
-	for i, iface := range o {
-		if i > 0 {
-			buf.WriteString(", ")
-		}
-		buf.WriteString(reflect.TypeOf(iface).Elem().String())
-	}
-	buf.WriteString(")")
-	return buf.String()
-}
+func (o provideAsOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o provideAsOption) applyProvideOption(opts *provideOptions) {
-	opts.As = append(opts.As, o...)
+	_ = "STUB: not implemented"
+	return
 }
 
 // LocationForPC is a ProvideOption which specifies an alternate function program
@@ -287,51 +203,44 @@ func (o provideAsOption) applyProvideOption(opts *provideOptions) {
 // and DOT graphs. This option is intended to be used with functions created
 // with the reflect.MakeFunc method whose error messages are otherwise hard to
 // understand
-func LocationForPC(pc uintptr) ProvideOption {
-	return provideLocationOption{
-		loc: digreflect.InspectFuncPC(pc),
-	}
-}
+func LocationForPC(pc uintptr) ProvideOption { _ = "STUB: not implemented"; return *new(ProvideOption) }
 
 type provideLocationOption struct{ loc *digreflect.Func }
 
-func (o provideLocationOption) String() string {
-	return fmt.Sprintf("LocationForPC(%v)", o.loc)
-}
+func (o provideLocationOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o provideLocationOption) applyProvideOption(opts *provideOptions) {
-	opts.Location = o.loc
+	_ = "STUB: not implemented"
+	return
+
+	// Export is a ProvideOption which specifies that the provided function should
+	// be made available to all Scopes available in the application, regardless
+	// of which Scope it was provided from. By default, it is false.
+	//
+	// For example,
+	//
+	//	c := New()
+	//	s1 := c.Scope("child 1")
+	//	s2:= c.Scope("child 2")
+	//	s1.Provide(func() *bytes.Buffer { ... })
+	//
+	// does not allow the constructor returning *bytes.Buffer to be made available to
+	// the root Container c or its sibling Scope s2.
+	//
+	// With Export, you can make this constructor available to all the Scopes:
+	//
+	//	s1.Provide(func() *bytes.Buffer { ... }, Export(true))
 }
 
-// Export is a ProvideOption which specifies that the provided function should
-// be made available to all Scopes available in the application, regardless
-// of which Scope it was provided from. By default, it is false.
-//
-// For example,
-//
-//	c := New()
-//	s1 := c.Scope("child 1")
-//	s2:= c.Scope("child 2")
-//	s1.Provide(func() *bytes.Buffer { ... })
-//
-// does not allow the constructor returning *bytes.Buffer to be made available to
-// the root Container c or its sibling Scope s2.
-//
-// With Export, you can make this constructor available to all the Scopes:
-//
-//	s1.Provide(func() *bytes.Buffer { ... }, Export(true))
-func Export(export bool) ProvideOption {
-	return provideExportOption{exported: export}
-}
+func Export(export bool) ProvideOption { _ = "STUB: not implemented"; return *new(ProvideOption) }
 
 type provideExportOption struct{ exported bool }
 
-func (o provideExportOption) String() string {
-	return fmt.Sprintf("Export(%v)", o.exported)
-}
+func (o provideExportOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o provideExportOption) applyProvideOption(opts *provideOptions) {
-	opts.Exported = o.exported
+	_ = "STUB: not implemented"
+	return
 }
 
 // provider encapsulates a user-provided constructor.
@@ -381,7 +290,8 @@ type provider interface {
 // Provide accepts argument types or dig.In structs as dependencies, and
 // separate return values or dig.Out structs for results.
 func (c *Container) Provide(constructor interface{}, opts ...ProvideOption) error {
-	return c.scope.Provide(constructor, opts...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Provide teaches the Scope how to build values of one or more types and
@@ -404,168 +314,34 @@ func (c *Container) Provide(constructor interface{}, opts ...ProvideOption) erro
 // To provide a constructor to all the Scopes available, provide it to
 // Container, which is the root Scope.
 func (s *Scope) Provide(constructor interface{}, opts ...ProvideOption) error {
-	ctype := reflect.TypeOf(constructor)
-	if ctype == nil {
-		return newErrInvalidInput("can't provide an untyped nil", nil)
-	}
-	if ctype.Kind() != reflect.Func {
-		return newErrInvalidInput(
-			fmt.Sprintf("must provide constructor function, got %v (type %v)", constructor, ctype), nil)
-	}
-
-	var options provideOptions
-	for _, o := range opts {
-		o.applyProvideOption(&options)
-	}
-	if err := options.Validate(); err != nil {
-		return err
-	}
-
-	if err := s.provide(constructor, options); err != nil {
-		var errFunc *digreflect.Func
-		if options.Location == nil {
-			errFunc = digreflect.InspectFunc(constructor)
-		} else {
-			errFunc = options.Location
-		}
-
-		return errProvide{
-			Func:   errFunc,
-			Reason: err,
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (s *Scope) provide(ctor interface{}, opts provideOptions) (err error) {
+	_ = "STUB: not implemented"
 	// If Export option is provided to the constructor, this should be injected to the
 	// root-level Scope (Container) to allow it to propagate to all other Scopes.
-	origScope := s
-	if opts.Exported {
-		s = s.rootScope()
-	}
-
-	// For all scopes affected by this change,
-	// take a snapshot of the current graph state before
-	// we start making changes to it as we may need to
-	// undo them upon encountering errors.
-	allScopes := s.appendSubscopes(nil)
-
-	defer func(allSc []*Scope) {
-		if err != nil {
-			for _, sc := range allSc {
-				sc.gh.Rollback()
-			}
-		}
-	}(allScopes)
-
-	for _, sc := range allScopes {
-		sc.gh.Snapshot()
-	}
-
-	n, err := newConstructorNode(
-		ctor,
-		s,
-		origScope,
-		constructorOptions{
-			ResultName:     opts.Name,
-			ResultGroup:    opts.Group,
-			ResultAs:       opts.As,
-			Location:       opts.Location,
-			Callback:       opts.Callback,
-			BeforeCallback: opts.BeforeCallback,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	keys, err := s.findAndValidateResults(n.ResultList())
-	if err != nil {
-		return err
-	}
-
-	ctype := reflect.TypeOf(ctor)
-	if len(keys) == 0 {
-		return newErrInvalidInput(
-			fmt.Sprintf("%v must provide at least one non-error type", ctype), nil)
-	}
-
-	oldProviders := make(map[key][]*constructorNode)
-	for k := range keys {
-		// Cache old providers before running cycle detection.
-		oldProviders[k] = s.providers[k]
-		s.providers[k] = append(s.providers[k], n)
-	}
-
-	for _, s := range allScopes {
-		s.isVerifiedAcyclic = false
-		if s.deferAcyclicVerification {
-			continue
-		}
-		if ok, cycle := graph.IsAcyclic(s.gh); !ok {
-			// When a cycle is detected, recover the old providers to reset
-			// the providers map back to what it was before this node was
-			// introduced.
-			for k, ops := range oldProviders {
-				s.providers[k] = ops
-			}
-
-			return newErrInvalidInput("this function introduces a cycle", s.cycleDetectedError(cycle))
-		}
-		s.isVerifiedAcyclic = true
-	}
-
-	s.nodes = append(s.nodes, n)
-
-	// Record introspection info for caller if Info option is specified
-	if info := opts.Info; info != nil {
-		params := n.ParamList().DotParam()
-		results := n.ResultList().DotResult()
-
-		info.ID = (ID)(n.id)
-		info.Inputs = make([]*Input, len(params))
-		info.Outputs = make([]*Output, len(results))
-
-		for i, param := range params {
-			info.Inputs[i] = &Input{
-				t:        param.Type,
-				optional: param.Optional,
-				name:     param.Name,
-				group:    param.Group,
-			}
-		}
-
-		for i, res := range results {
-			info.Outputs[i] = &Output{
-				t:     res.Type,
-				name:  res.Name,
-				group: res.Group,
-			}
-		}
-	}
 	return nil
 }
 
+// For all scopes affected by this change,
+// take a snapshot of the current graph state before
+// we start making changes to it as we may need to
+// undo them upon encountering errors.
+
+// Cache old providers before running cycle detection.
+
+// When a cycle is detected, recover the old providers to reset
+// the providers map back to what it was before this node was
+// introduced.
+
+// Record introspection info for caller if Info option is specified
+
 // Builds a collection of all result types produced by this constructor.
 func (s *Scope) findAndValidateResults(rl resultList) (map[key]struct{}, error) {
-	var err error
-	keyPaths := make(map[key]string)
-	walkResult(rl, connectionVisitor{
-		s:        s,
-		err:      &err,
-		keyPaths: keyPaths,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	keys := make(map[key]struct{}, len(keyPaths))
-	for k := range keyPaths {
-		keys[k] = struct{}{}
-	}
-	return keys, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Visits the results of a node and compiles a collection of all the keys
@@ -602,69 +378,26 @@ type connectionVisitor struct {
 }
 
 func (cv connectionVisitor) AnnotateWithField(f resultObjectField) resultVisitor {
-	cv.currentResultPath = append(cv.currentResultPath, f.FieldName)
-	return cv
+	_ = "STUB: not implemented"
+	return *new(resultVisitor)
 }
 
 func (cv connectionVisitor) AnnotateWithPosition(i int) resultVisitor {
-	cv.currentResultPath = append(cv.currentResultPath, fmt.Sprintf("[%d]", i))
-	return cv
+	_ = "STUB: not implemented"
+	return *new(resultVisitor)
 }
 
 func (cv connectionVisitor) Visit(res result) resultVisitor {
+	_ = "STUB: not implemented"
 	// Already failed. Stop looking.
-	if *cv.err != nil {
-		return nil
-	}
-
-	path := strings.Join(cv.currentResultPath, ".")
-
-	switch r := res.(type) {
-
-	case resultSingle:
-		k := key{name: r.Name, t: r.Type}
-
-		if err := cv.checkKey(k, path); err != nil {
-			*cv.err = err
-			return nil
-		}
-		for _, asType := range r.As {
-			k := key{name: r.Name, t: asType}
-			if err := cv.checkKey(k, path); err != nil {
-				*cv.err = err
-				return nil
-			}
-		}
-
-	case resultGrouped:
-		// we don't really care about the path for this since conflicts are
-		// okay for group results. We'll track it for the sake of having a
-		// value there.
-		k := key{group: r.Group, t: r.Type}
-		cv.keyPaths[k] = path
-		for _, asType := range r.As {
-			k := key{group: r.Group, t: asType}
-			cv.keyPaths[k] = path
-		}
-	}
-
-	return cv
+	return *new(resultVisitor)
 }
 
-func (cv connectionVisitor) checkKey(k key, path string) error {
-	defer func() { cv.keyPaths[k] = path }()
-	if conflict, ok := cv.keyPaths[k]; ok {
-		return newErrInvalidInput(fmt.Sprintf("cannot provide %v from %v", k, path),
-			newErrInvalidInput(fmt.Sprintf("already provided by %v", conflict), nil))
-	}
-	if ps := cv.s.providers[k]; len(ps) > 0 {
-		cons := make([]string, len(ps))
-		for i, p := range ps {
-			cons[i] = fmt.Sprint(p.Location())
-		}
+// we don't really care about the path for this since conflicts are
+// okay for group results. We'll track it for the sake of having a
+// value there.
 
-		return newErrInvalidInput(fmt.Sprintf("cannot provide %v from %v", k, path),
-			newErrInvalidInput(fmt.Sprintf("already provided by %v", strings.Join(cons, "; ")), nil))
-	}
+func (cv connectionVisitor) checkKey(k key, path string) error {
+	_ = "STUB: not implemented"
 	return nil
 }

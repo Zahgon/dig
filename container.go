@@ -21,7 +21,6 @@
 package dig
 
 import (
-	"fmt"
 	"math/rand"
 	"reflect"
 
@@ -44,15 +43,7 @@ type key struct {
 	group string
 }
 
-func (k key) String() string {
-	if k.name != "" {
-		return fmt.Sprintf("%v[name=%q]", k.t, k.name)
-	}
-	if k.group != "" {
-		return fmt.Sprintf("%v[group=%q]", k.t, k.group)
-	}
-	return k.t.String()
-}
+func (k key) String() string { _ = "STUB: not implemented"; return "" }
 
 // Option configures a Container.
 type Option interface {
@@ -148,15 +139,7 @@ type containerStore interface {
 }
 
 // New constructs a Container.
-func New(opts ...Option) *Container {
-	s := newScope()
-	c := &Container{scope: s}
-
-	for _, opt := range opts {
-		opt.applyOption(c)
-	}
-	return c
-}
+func New(opts ...Option) *Container { _ = "STUB: not implemented"; return nil }
 
 // DeferAcyclicVerification is an Option to override the default behavior
 // of container.Provide, deferring the dependency graph validation to no longer
@@ -165,137 +148,94 @@ func New(opts ...Option) *Container {
 //
 // Applications adding providers to a container in a tight loop may experience
 // performance improvements by initializing the container with this option.
-func DeferAcyclicVerification() Option {
-	return deferAcyclicVerificationOption{}
-}
+func DeferAcyclicVerification() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type deferAcyclicVerificationOption struct{}
 
-func (deferAcyclicVerificationOption) String() string {
-	return "DeferAcyclicVerification()"
-}
+func (deferAcyclicVerificationOption) String() string { _ = "STUB: not implemented"; return "" }
 
-func (deferAcyclicVerificationOption) applyOption(c *Container) {
-	c.scope.deferAcyclicVerification = true
-}
+func (deferAcyclicVerificationOption) applyOption(c *Container) { _ = "STUB: not implemented"; return }
 
 // RecoverFromPanics is an [Option] to recover from panics that occur while
 // running functions given to the container. When set, recovered panics
 // will be placed into a [PanicError], and returned at the invoke callsite.
 // See [PanicError] for an example on how to handle panics with this option
 // enabled, and distinguish them from errors.
-func RecoverFromPanics() Option {
-	return recoverFromPanicsOption{}
-}
+func RecoverFromPanics() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type recoverFromPanicsOption struct{}
 
-func (recoverFromPanicsOption) String() string {
-	return "RecoverFromPanics()"
-}
+func (recoverFromPanicsOption) String() string { _ = "STUB: not implemented"; return "" }
 
-func (recoverFromPanicsOption) applyOption(c *Container) {
-	c.scope.recoverFromPanics = true
-}
+func (recoverFromPanicsOption) applyOption(c *Container) { _ = "STUB: not implemented"; return }
 
 // Changes the source of randomness for the container.
 //
 // This will help provide determinism during tests.
-func setRand(r *rand.Rand) Option {
-	return setRandOption{r: r}
-}
+func setRand(r *rand.Rand) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type setRandOption struct{ r *rand.Rand }
 
-func (o setRandOption) String() string {
-	return fmt.Sprintf("setRand(%p)", o.r)
-}
+func (o setRandOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o setRandOption) applyOption(c *Container) {
-	c.scope.rand = o.r
+	_ = "STUB: not implemented"
+
+	// Changes the source of time for the container.
+	return
 }
 
-// Changes the source of time for the container.
-func setClock(c digclock.Clock) Option {
-	return setClockOption{c: c}
-}
+func setClock(c digclock.Clock) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type setClockOption struct{ c digclock.Clock }
 
-func (o setClockOption) String() string {
-	return fmt.Sprintf("setClock(%v)", o.c)
-}
+func (o setClockOption) String() string { _ = "STUB: not implemented"; return "" }
 
-func (o setClockOption) applyOption(c *Container) {
-	c.scope.clockSrc = o.c
-}
+func (o setClockOption) applyOption(c *Container) { _ = "STUB: not implemented"; return }
 
 // DryRun is an Option which, when set to true, disables invocation of functions supplied to
 // Provide and Invoke. Use this to build no-op containers.
-func DryRun(dry bool) Option {
-	return dryRunOption(dry)
-}
+func DryRun(dry bool) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type dryRunOption bool
 
-func (o dryRunOption) String() string {
-	return fmt.Sprintf("DryRun(%v)", bool(o))
-}
+func (o dryRunOption) String() string { _ = "STUB: not implemented"; return "" }
 
-func (o dryRunOption) applyOption(c *Container) {
-	if o {
-		c.scope.invokerFn = dryInvoker
-	} else {
-		c.scope.invokerFn = defaultInvoker
-	}
-}
+func (o dryRunOption) applyOption(c *Container) { _ = "STUB: not implemented"; return }
 
 // invokerFn specifies how the container calls user-supplied functions.
 type invokerFn func(fn reflect.Value, args []reflect.Value) (results []reflect.Value)
 
 func defaultInvoker(fn reflect.Value, args []reflect.Value) []reflect.Value {
-	return fn.Call(args)
+	_ = "STUB: not implemented"
+	return nil
+
+	// Generates zero values for results without calling the supplied function.
 }
 
-// Generates zero values for results without calling the supplied function.
 func dryInvoker(fn reflect.Value, _ []reflect.Value) []reflect.Value {
-	ft := fn.Type()
-	results := make([]reflect.Value, ft.NumOut())
-	for i := 0; i < ft.NumOut(); i++ {
-		results[i] = reflect.Zero(fn.Type().Out(i))
-	}
-
-	return results
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // String representation of the entire Container
-func (c *Container) String() string {
-	return c.scope.String()
-}
+func (c *Container) String() string { _ = "STUB: not implemented"; return "" }
 
 // Scope creates a child scope of the Container with the given name.
 func (c *Container) Scope(name string, opts ...ScopeOption) *Scope {
-	return c.scope.Scope(name, opts...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type byTypeName []reflect.Type
 
-func (bs byTypeName) Len() int {
-	return len(bs)
-}
+func (bs byTypeName) Len() int { _ = "STUB: not implemented"; return 0 }
 
-func (bs byTypeName) Less(i int, j int) bool {
-	return fmt.Sprint(bs[i]) < fmt.Sprint(bs[j])
-}
+func (bs byTypeName) Less(i int, j int) bool { _ = "STUB: not implemented"; return false }
 
-func (bs byTypeName) Swap(i int, j int) {
-	bs[i], bs[j] = bs[j], bs[i]
-}
+func (bs byTypeName) Swap(i int, j int) { _ = "STUB: not implemented"; return }
 
 func shuffledCopy(rand *rand.Rand, items []reflect.Value) []reflect.Value {
-	newItems := make([]reflect.Value, len(items))
-	for i, j := range rand.Perm(len(items)) {
-		newItems[i] = items[j]
-	}
-	return newItems
+	_ = "STUB: not implemented"
+	return nil
 }

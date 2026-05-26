@@ -20,15 +20,6 @@
 
 package digerror
 
-import (
-	"fmt"
-)
-
 // BugPanicf panics with the provided message directing users to GitHub issues
 // creation page.
-func BugPanicf(msg string, args ...interface{}) {
-	panic(fmt.Sprintf("It looks like you have found a bug in dig. "+
-		"Please file an issue at https://github.com/uber-go/dig/issues/new "+
-		"and provide the following message: "+
-		msg, args...))
-}
+func BugPanicf(msg string, args ...interface{}) { _ = "STUB: not implemented"; return }

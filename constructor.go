@@ -21,10 +21,8 @@
 package dig
 
 import (
-	"fmt"
 	"reflect"
 
-	"go.uber.org/dig/internal/digerror"
 	"go.uber.org/dig/internal/digreflect"
 	"go.uber.org/dig/internal/dot"
 )
@@ -83,131 +81,41 @@ type constructorOptions struct {
 }
 
 func newConstructorNode(ctor interface{}, s *Scope, origS *Scope, opts constructorOptions) (*constructorNode, error) {
-	cval := reflect.ValueOf(ctor)
-	ctype := cval.Type()
-	cptr := cval.Pointer()
-
-	params, err := newParamList(ctype, s)
-	if err != nil {
-		return nil, err
-	}
-
-	results, err := newResultList(
-		ctype,
-		resultOptions{
-			Name:  opts.ResultName,
-			Group: opts.ResultGroup,
-			As:    opts.ResultAs,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	location := opts.Location
-	if location == nil {
-		location = digreflect.InspectFunc(ctor)
-	}
-
-	n := &constructorNode{
-		ctor:           ctor,
-		ctype:          ctype,
-		location:       location,
-		id:             dot.CtorID(cptr),
-		paramList:      params,
-		resultList:     results,
-		orders:         make(map[*Scope]int),
-		s:              s,
-		origS:          origS,
-		callback:       opts.Callback,
-		beforeCallback: opts.BeforeCallback,
-	}
-	s.newGraphNode(n, n.orders)
-	return n, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (n *constructorNode) Location() *digreflect.Func { return n.location }
-func (n *constructorNode) ParamList() paramList       { return n.paramList }
-func (n *constructorNode) ResultList() resultList     { return n.resultList }
-func (n *constructorNode) ID() dot.CtorID             { return n.id }
-func (n *constructorNode) CType() reflect.Type        { return n.ctype }
-func (n *constructorNode) Order(s *Scope) int         { return n.orders[s] }
-func (n *constructorNode) OrigScope() *Scope          { return n.origS }
+func (n *constructorNode) Location() *digreflect.Func { _ = "STUB: not implemented"; return nil }
+func (n *constructorNode) ParamList() paramList       { _ = "STUB: not implemented"; return *new(paramList) }
+func (n *constructorNode) ResultList() resultList {
+	_ = "STUB: not implemented"
+	return *new(resultList)
+}
+func (n *constructorNode) ID() dot.CtorID { _ = "STUB: not implemented"; return *new(dot.CtorID) }
+func (n *constructorNode) CType() reflect.Type {
+	_ = "STUB: not implemented"
+	return *new(reflect.Type)
+}
+func (n *constructorNode) Order(s *Scope) int { _ = "STUB: not implemented"; return 0 }
+func (n *constructorNode) OrigScope() *Scope  { _ = "STUB: not implemented"; return nil }
 
 // CopyOrder copies the order for the given parent scope to the given child scope.
-func (n *constructorNode) CopyOrder(parent, child *Scope) {
-	n.orders[child] = n.orders[parent]
-}
+func (n *constructorNode) CopyOrder(parent, child *Scope) { _ = "STUB: not implemented"; return }
 
-func (n *constructorNode) String() string {
-	return fmt.Sprintf("deps: %v, ctor: %v", n.paramList, n.ctype)
-}
+func (n *constructorNode) String() string { _ = "STUB: not implemented"; return "" }
 
 // Call calls this constructor if it hasn't already been called and
 // injects any values produced by it into the provided container.
-func (n *constructorNode) Call(c containerStore) (err error) {
-	if n.called {
-		return nil
-	}
+func (n *constructorNode) Call(c containerStore) (err error) { _ = "STUB: not implemented"; return nil }
 
-	if err := shallowCheckDependencies(c, n.paramList); err != nil {
-		return errMissingDependencies{
-			Func:   n.location,
-			Reason: err,
-		}
-	}
+// Wrap in separate func to include PanicErrors
 
-	args, err := n.paramList.BuildList(c)
-	if err != nil {
-		return errArgumentsFailed{
-			Func:   n.location,
-			Reason: err,
-		}
-	}
+/* decorating */
 
-	if n.beforeCallback != nil {
-		n.beforeCallback(BeforeCallbackInfo{
-			Name: fmt.Sprintf("%v.%v", n.location.Package, n.location.Name),
-		})
-	}
-
-	if n.callback != nil {
-		start := c.clock().Now()
-		// Wrap in separate func to include PanicErrors
-		defer func() {
-			n.callback(CallbackInfo{
-				Name:    fmt.Sprintf("%v.%v", n.location.Package, n.location.Name),
-				Error:   err,
-				Runtime: c.clock().Since(start),
-			})
-		}()
-	}
-
-	if n.s.recoverFromPanics {
-		defer func() {
-			if p := recover(); p != nil {
-				err = PanicError{
-					fn:    n.location,
-					Panic: p,
-				}
-			}
-		}()
-	}
-
-	receiver := newStagingContainerWriter()
-	results := c.invoker()(reflect.ValueOf(n.ctor), args)
-	if err = n.resultList.ExtractList(receiver, false /* decorating */, results); err != nil {
-		return errConstructorFailed{Func: n.location, Reason: err}
-	}
-
-	// Commit the result to the original container that this constructor
-	// was supplied to. The provided constructor is only used for a view of
-	// the rest of the graph to instantiate the dependencies of this
-	// container.
-	receiver.Commit(n.s)
-	n.called = true
-	return nil
-}
+// Commit the result to the original container that this constructor
+// was supplied to. The provided constructor is only used for a view of
+// the rest of the graph to instantiate the dependencies of this
+// container.
 
 // stagingContainerWriter is a containerWriter that records the changes that
 // would be made to a containerWriter and defers them until Commit is called.
@@ -218,39 +126,27 @@ type stagingContainerWriter struct {
 
 var _ containerWriter = (*stagingContainerWriter)(nil)
 
-func newStagingContainerWriter() *stagingContainerWriter {
-	return &stagingContainerWriter{
-		values: make(map[key]reflect.Value),
-		groups: make(map[key][]reflect.Value),
-	}
-}
+func newStagingContainerWriter() *stagingContainerWriter { _ = "STUB: not implemented"; return nil }
 
 func (sr *stagingContainerWriter) setValue(name string, t reflect.Type, v reflect.Value) {
-	sr.values[key{t: t, name: name}] = v
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sr *stagingContainerWriter) setDecoratedValue(_ string, _ reflect.Type, _ reflect.Value) {
-	digerror.BugPanicf("stagingContainerWriter.setDecoratedValue must never be called")
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sr *stagingContainerWriter) submitGroupedValue(group string, t reflect.Type, v reflect.Value) {
-	k := key{t: t, group: group}
-	sr.groups[k] = append(sr.groups[k], v)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (sr *stagingContainerWriter) submitDecoratedGroupedValue(_ string, _ reflect.Type, _ reflect.Value) {
-	digerror.BugPanicf("stagingContainerWriter.submitDecoratedGroupedValue must never be called")
+	_ = "STUB: not implemented"
+	return
 }
 
 // Commit commits the received results to the provided containerWriter.
-func (sr *stagingContainerWriter) Commit(cw containerWriter) {
-	for k, v := range sr.values {
-		cw.setValue(k.name, k.t, v)
-	}
-
-	for k, vs := range sr.groups {
-		for _, v := range vs {
-			cw.submitGroupedValue(k.group, k.t, v)
-		}
-	}
-}
+func (sr *stagingContainerWriter) Commit(cw containerWriter) { _ = "STUB: not implemented"; return }

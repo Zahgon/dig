@@ -65,9 +65,8 @@ type Callback func(CallbackInfo)
 //
 // See [CallbackInfo] for more info on the information passed to the [Callback].
 func WithProviderCallback(callback Callback) ProvideOption {
-	return withCallbackOption{
-		callback: callback,
-	}
+	_ = "STUB: not implemented"
+	return *new(ProvideOption)
 }
 
 // WithDecoratorCallback returns a [DecorateOption] which has Dig call
@@ -90,9 +89,8 @@ func WithProviderCallback(callback Callback) ProvideOption {
 //
 // See [CallbackInfo] for more info on the information passed to the [Callback].
 func WithDecoratorCallback(callback Callback) DecorateOption {
-	return withCallbackOption{
-		callback: callback,
-	}
+	_ = "STUB: not implemented"
+	return *new(DecorateOption)
 }
 
 type withCallbackOption struct {
@@ -105,9 +103,8 @@ var (
 )
 
 func (o withCallbackOption) applyProvideOption(po *provideOptions) {
-	po.Callback = o.callback
+	_ = "STUB: not implemented"
+	return
 }
 
-func (o withCallbackOption) apply(do *decorateOptions) {
-	do.Callback = o.callback
-}
+func (o withCallbackOption) apply(do *decorateOptions) { _ = "STUB: not implemented"; return }

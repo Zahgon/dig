@@ -35,21 +35,22 @@ var System Clock = systemClock{}
 
 type systemClock struct{}
 
-func (systemClock) Now() time.Time {
-	return time.Now()
-}
+func (systemClock) Now() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
 func (systemClock) Since(t time.Time) time.Duration {
-	return time.Since(t)
+	_ = "STUB: not implemented"
+	return *
+
+	// Mock is a fake source of time.
+	// It implements standard time operations, but allows
+	// the user to control the passage of time.
+	//
+	// Use the [Mock.Add] method to progress time.
+	//
+	// Note that this implementation is not safe for concurrent use.
+	new(time.Duration)
 }
 
-// Mock is a fake source of time.
-// It implements standard time operations, but allows
-// the user to control the passage of time.
-//
-// Use the [Mock.Add] method to progress time.
-//
-// Note that this implementation is not safe for concurrent use.
 type Mock struct {
 	now time.Time
 }
@@ -57,26 +58,24 @@ type Mock struct {
 var _ Clock = (*Mock)(nil)
 
 // NewMock creates a new mock clock with the current time set to the current time.
-func NewMock() *Mock {
-	return &Mock{now: time.Now()}
-}
+func NewMock() *Mock { _ = "STUB: not implemented"; return nil }
 
 // Now returns the current time.
 func (m *Mock) Now() time.Time {
-	return m.now
+	_ = "STUB: not implemented"
+
+	// Since returns the time elapsed since the given time.
+	return *new(time.Time)
 }
 
-// Since returns the time elapsed since the given time.
 func (m *Mock) Since(t time.Time) time.Duration {
-	return m.Now().Sub(t)
+	_ = "STUB: not implemented"
+	return *
+
+	// Add progresses time by the given duration.
+	//
+	// It panics if the duration is negative.
+	new(time.Duration)
 }
 
-// Add progresses time by the given duration.
-//
-// It panics if the duration is negative.
-func (m *Mock) Add(d time.Duration) {
-	if d < 0 {
-		panic("cannot add negative duration")
-	}
-	m.now = m.now.Add(d)
-}
+func (m *Mock) Add(d time.Duration) { _ = "STUB: not implemented"; return }

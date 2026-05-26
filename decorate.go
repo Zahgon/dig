@@ -21,7 +21,6 @@
 package dig
 
 import (
-	"fmt"
 	"reflect"
 
 	"go.uber.org/dig/internal/digreflect"
@@ -74,98 +73,25 @@ type decoratorNode struct {
 }
 
 func newDecoratorNode(dcor interface{}, s *Scope, opts decorateOptions) (*decoratorNode, error) {
-	dval := reflect.ValueOf(dcor)
-	dtype := dval.Type()
-	dptr := dval.Pointer()
-
-	pl, err := newParamList(dtype, s)
-	if err != nil {
-		return nil, err
-	}
-
-	rl, err := newResultList(dtype, resultOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	n := &decoratorNode{
-		dcor:           dcor,
-		dtype:          dtype,
-		id:             dot.CtorID(dptr),
-		location:       digreflect.InspectFunc(dcor),
-		orders:         make(map[*Scope]int),
-		params:         pl,
-		results:        rl,
-		s:              s,
-		callback:       opts.Callback,
-		beforeCallback: opts.BeforeCallback,
-	}
-	return n, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (n *decoratorNode) Call(s containerStore) (err error) {
-	if n.state == decoratorCalled {
-		return nil
-	}
+func (n *decoratorNode) Call(s containerStore) (err error) { _ = "STUB: not implemented"; return nil }
 
-	n.state = decoratorOnStack
+// Wrap in separate func to include PanicErrors
 
-	if err := shallowCheckDependencies(s, n.params); err != nil {
-		return errMissingDependencies{
-			Func:   n.location,
-			Reason: err,
-		}
-	}
+/* decorated */
 
-	args, err := n.params.BuildList(n.s)
-	if err != nil {
-		return errArgumentsFailed{
-			Func:   n.location,
-			Reason: err,
-		}
-	}
-	if n.beforeCallback != nil {
-		n.beforeCallback(BeforeCallbackInfo{
-			Name: fmt.Sprintf("%v.%v", n.location.Package, n.location.Name),
-		})
-	}
+func (n *decoratorNode) ID() dot.CtorID { _ = "STUB: not implemented"; return *new(dot.CtorID) }
 
-	if n.callback != nil {
-		start := s.clock().Now()
-		// Wrap in separate func to include PanicErrors
-		defer func() {
-			n.callback(CallbackInfo{
-				Name:    fmt.Sprintf("%v.%v", n.location.Package, n.location.Name),
-				Error:   err,
-				Runtime: s.clock().Since(start),
-			})
-		}()
-	}
+func (n *decoratorNode) State() decoratorState {
+	_ = "STUB: not implemented"
 
-	if n.s.recoverFromPanics {
-		defer func() {
-			if p := recover(); p != nil {
-				err = PanicError{
-					fn:    n.location,
-					Panic: p,
-				}
-			}
-		}()
-	}
-
-	results := s.invoker()(reflect.ValueOf(n.dcor), args)
-	if err = n.results.ExtractList(n.s, true /* decorated */, results); err != nil {
-		return err
-	}
-	n.state = decoratorCalled
-	return nil
+	// DecorateOption modifies the default behavior of Decorate.
+	return *new(decoratorState)
 }
 
-func (n *decoratorNode) ID() dot.CtorID { return n.id }
-
-func (n *decoratorNode) State() decoratorState { return n.state }
-
-// DecorateOption modifies the default behavior of Decorate.
 type DecorateOption interface {
 	apply(*decorateOptions)
 }
@@ -179,21 +105,22 @@ type decorateOptions struct {
 // FillDecorateInfo is a DecorateOption that writes info on what Dig was
 // able to get out of the provided decorator into the provided DecorateInfo.
 func FillDecorateInfo(info *DecorateInfo) DecorateOption {
-	return fillDecorateInfoOption{info: info}
+	_ = "STUB: not implemented"
+	return *new(DecorateOption)
 }
 
 type fillDecorateInfoOption struct{ info *DecorateInfo }
 
-func (o fillDecorateInfoOption) String() string {
-	return fmt.Sprintf("FillDecorateInfo(%p)", o.info)
-}
+func (o fillDecorateInfoOption) String() string { _ = "STUB: not implemented"; return "" }
 
 func (o fillDecorateInfoOption) apply(opts *decorateOptions) {
-	opts.Info = o.info
+	_ = "STUB: not implemented"
+
+	// DecorateInfo provides information about the decorator's inputs and outputs
+	// types as strings, as well as the ID of the decorator supplied to the Container.
+	return
 }
 
-// DecorateInfo provides information about the decorator's inputs and outputs
-// types as strings, as well as the ID of the decorator supplied to the Container.
 type DecorateInfo struct {
 	ID      ID
 	Inputs  []*Input
@@ -204,7 +131,8 @@ type DecorateInfo struct {
 // Decorations at this level affect all scopes of the container.
 // See Scope.Decorate for information on how to use this method.
 func (c *Container) Decorate(decorator interface{}, opts ...DecorateOption) error {
-	return c.scope.Decorate(decorator, opts...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Decorate provides a decorator for a type that has already been provided in the Scope.
@@ -245,81 +173,12 @@ func (c *Container) Decorate(decorator interface{}, opts ...DecorateOption) erro
 //
 // Similar to a provider, the decorator function gets called *at most once*.
 func (s *Scope) Decorate(decorator interface{}, opts ...DecorateOption) error {
-	var options decorateOptions
-	for _, opt := range opts {
-		opt.apply(&options)
-	}
-
-	dn, err := newDecoratorNode(decorator, s, options)
-	if err != nil {
-		return err
-	}
-
-	keys, err := findResultKeys(dn.results)
-	if err != nil {
-		return err
-	}
-	for _, k := range keys {
-		if _, ok := s.decorators[k]; ok {
-			return newErrInvalidInput(
-				fmt.Sprintf("cannot decorate using function %v: %s already decorated", dn.dtype, k), nil)
-		}
-		s.decorators[k] = dn
-	}
-
-	if info := options.Info; info != nil {
-		params := dn.params.DotParam()
-		results := dn.results.DotResult()
-		info.ID = (ID)(dn.id)
-		info.Inputs = make([]*Input, len(params))
-		info.Outputs = make([]*Output, len(results))
-
-		for i, param := range params {
-			info.Inputs[i] = &Input{
-				t:        param.Type,
-				optional: param.Optional,
-				name:     param.Name,
-				group:    param.Group,
-			}
-		}
-		for i, res := range results {
-			info.Outputs[i] = &Output{
-				t:     res.Type,
-				name:  res.Name,
-				group: res.Group,
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func findResultKeys(r resultList) ([]key, error) {
+	_ = "STUB: not implemented"
 	// use BFS to search for all keys included in a resultList.
-	var (
-		q    []result
-		keys []key
-	)
-	q = append(q, r)
-
-	for len(q) > 0 {
-		res := q[0]
-		q = q[1:]
-
-		switch innerResult := res.(type) {
-		case resultSingle:
-			keys = append(keys, key{t: innerResult.Type, name: innerResult.Name})
-		case resultGrouped:
-			if innerResult.Type.Kind() != reflect.Slice {
-				return nil, newErrInvalidInput("decorating a value group requires decorating the entire value group, not a single value", nil)
-			}
-			keys = append(keys, key{t: innerResult.Type.Elem(), group: innerResult.Group})
-		case resultObject:
-			for _, f := range innerResult.Fields {
-				q = append(q, f.Result)
-			}
-		case resultList:
-			q = append(q, innerResult.Results...)
-		}
-	}
-	return keys, nil
+	return nil, nil
 }
